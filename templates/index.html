@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Grade Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --card-bg: rgba(18, 25, 41, 0.75);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-primary: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.3);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            
+            --grade-aplus: #a855f7;
+            --grade-a: #3b82f6;
+            --grade-b: #10b981;
+            --grade-c: #eab308;
+            --grade-d: #f97316;
+            --grade-f: #ef4444;
+            
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(168, 85, 247, 0.12) 0%, transparent 40%);
+            background-attachment: fixed;
+            padding-bottom: 60px;
+        }
+
+        header {
+            background: rgba(9, 13, 22, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 16px 0;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 22px;
+            color: #fff;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        .logo-text h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 30%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .badge-tag {
+            background: rgba(99, 102, 241, 0.15);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-pulse {
+            width: 8px;
+            height: 8px;
+            background-color: #34d399;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #34d399;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 32px auto 0;
+            padding: 0 24px;
+        }
+
+        /* Nav Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            background: rgba(18, 25, 41, 0.6);
+            padding: 6px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--card-border);
+            margin-bottom: 28px;
+            width: fit-content;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .tab-btn.active {
+            background: var(--accent-primary);
+            color: #ffffff;
+            box-shadow: 0 4px 14px var(--accent-glow);
+        }
+
+        /* Layout Grid */
+        .grid-two {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-two {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Glass Card */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.14);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title svg {
+            color: var(--accent-primary);
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(9, 13, 22, 0.7);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .subjects-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .subject-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 40px;
+            gap: 10px;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn {
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: #fff;
+            box-shadow: 0 4px 14px var(--accent-glow);
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-icon {
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            border-radius: var(--radius-sm);
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .btn-icon:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        /* Notifications / Toast */
+        .toast {
+            padding: 14px 18px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 18px;
+            font-size: 14px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .toast.success {
+            display: flex;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+        }
+
+        .toast.error {
+            display: flex;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+
+        /* Grade Badges */
+        .grade-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            min-width: 44px;
+        }
+
+        .grade-Aplus { background: rgba(168, 85, 247, 0.2); color: var(--grade-aplus); border: 1px solid rgba(168, 85, 247, 0.4); }
+        .grade-A { background: rgba(59, 130, 246, 0.2); color: var(--grade-a); border: 1px solid rgba(59, 130, 246, 0.4); }
+        .grade-B { background: rgba(16, 185, 129, 0.2); color: var(--grade-b); border: 1px solid rgba(16, 185, 129, 0.4); }
+        .grade-C { background: rgba(234, 179, 8, 0.2); color: var(--grade-c); border: 1px solid rgba(234, 179, 8, 0.4); }
+        .grade-D { background: rgba(249, 115, 22, 0.2); color: var(--grade-d); border: 1px solid rgba(249, 115, 22, 0.4); }
+        .grade-F { background: rgba(239, 68, 68, 0.2); color: var(--grade-f); border: 1px solid rgba(239, 68, 68, 0.4); }
+
+        /* Student Card List */
+        .student-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 18px;
+        }
+
+        .student-item-card {
+            background: rgba(14, 20, 33, 0.7);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            transition: var(--transition);
+        }
+
+        .student-item-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .student-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .student-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .student-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .subject-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 12px 0;
+        }
+
+        .subject-tag {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .subject-tag span {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .student-card-stats {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 13px;
+        }
+
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .stat-val {
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* Analytics Section */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .metric-card {
+            background: rgba(14, 20, 33, 0.8);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .metric-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(99, 102, 241, 0.15);
+            color: #818cf8;
+        }
+
+        .metric-info .val {
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .metric-info .lbl {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Distribution Bar Chart */
+        .dist-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .dist-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dist-grade {
+            width: 32px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .dist-bar-bg {
+            flex: 1;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .dist-bar-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.6s ease;
+        }
+
+        .dist-count {
+            width: 28px;
+            text-align: right;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-dim);
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo-area">
+                <div class="logo-icon">SG</div>
+                <div class="logo-text">
+                    <h1>Student Grade Management</h1>
+                    <p>Academic Analytics & Evaluation Portal</p>
+                </div>
+            </div>
+            <div class="badge-tag">
+                <div class="badge-pulse"></div>
+                System Active
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Tab Navigation -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('dashboard')">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                Dashboard
+            </button>
+            <button class="tab-btn" onclick="switchTab('add-student')">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+                Add Student
+            </button>
+            <button class="tab-btn" onclick="switchTab('search')">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                Search
+            </button>
+            <button class="tab-btn" onclick="switchTab('reports')">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                Class Report
+            </button>
+        </div>
+
+        <!-- 1. DASHBOARD VIEW -->
+        <div id="view-dashboard" class="view-section active">
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        All Registered Students
+                    </div>
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;" onclick="loadStudents()">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        Refresh
+                    </button>
+                </div>
+                <div id="students-grid" class="student-cards-grid">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. ADD STUDENT VIEW -->
+        <div id="view-add-student" class="view-section">
+            <div class="grid-two">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                            Register New Student
+                        </div>
+                    </div>
+                    <div id="form-toast" class="toast"></div>
+                    <form id="add-student-form" onsubmit="handleAddStudent(event)">
+                        <div class="form-group">
+                            <label class="form-label">Student Full Name</label>
+                            <input type="text" id="student-name-input" class="form-input" placeholder="e.g. John Doe" required>
+                        </div>
+
+                        <div class="form-group">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <label class="form-label" style="margin: 0;">Subjects & Marks (0-100)</label>
+                                <button type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px;" onclick="addSubjectRow()">+ Add Row</button>
+                            </div>
+                            <div id="subjects-container" class="subjects-container">
+                                <!-- Dynamic rows -->
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                            Save Student Record
+                        </button>
+                    </form>
+                </div>
+
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Grading System Guidelines
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 14px; font-size: 14px; color: var(--text-muted);">
+                        <p>Our evaluation algorithm computes letter grades automatically based on the weighted average of entered subjects:</p>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid var(--card-border);">
+                                <div class="grade-badge grade-Aplus" style="margin-bottom: 4px;">A+</div>
+                                <div>90 - 100% (Outstanding)</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid var(--card-border);">
+                                <div class="grade-badge grade-A" style="margin-bottom: 4px;">A</div>
+                                <div>80 - 89% (Excellent)</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid var(--card-border);">
+                                <div class="grade-badge grade-B" style="margin-bottom: 4px;">B</div>
+                                <div>70 - 79% (Good)</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid var(--card-border);">
+                                <div class="grade-badge grade-C" style="margin-bottom: 4px;">C</div>
+                                <div>60 - 69% (Satisfactory)</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid var(--card-border);">
+                                <div class="grade-badge grade-D" style="margin-bottom: 4px;">D</div>
+                                <div>50 - 59% (Pass)</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid var(--card-border);">
+                                <div class="grade-badge grade-F" style="margin-bottom: 4px;">F</div>
+                                <div>0 - 49% (Fail)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. SEARCH VIEW -->
+        <div id="view-search" class="view-section">
+            <div class="glass-card" style="max-width: 650px; margin: 0 auto;">
+                <div class="card-header">
+                    <div class="card-title">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        Search Student Record
+                    </div>
+                </div>
+                <div class="form-group" style="display: flex; gap: 10px;">
+                    <input type="text" id="search-input" class="form-input" placeholder="Enter student name..." onkeyup="if(event.key==='Enter') handleSearch()">
+                    <button class="btn btn-primary" style="width: auto; padding: 0 24px;" onclick="handleSearch()">Search</button>
+                </div>
+
+                <div id="search-result-area" style="margin-top: 20px;">
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <p>Type a name above to search for student records.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. CLASS REPORT VIEW -->
+        <div id="view-reports" class="view-section">
+            <div class="analytics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    </div>
+                    <div class="metric-info">
+                        <div id="rep-total-students" class="val">-</div>
+                        <div class="lbl">Total Class Enrollment</div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                    </div>
+                    <div class="metric-info">
+                        <div id="rep-class-avg" class="val">-</div>
+                        <div class="lbl">Class Mean Average</div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: rgba(168, 85, 247, 0.15); color: #c084fc;">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                    </div>
+                    <div class="metric-info">
+                        <div id="rep-class-grade" class="val">-</div>
+                        <div class="lbl">Overall Class Grade</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-two">
+                <!-- Top & Bottom Performers -->
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                            Key Performance Highlights
+                        </div>
+                    </div>
+                    
+                    <div id="performers-container" style="display: flex; flex-direction: column; gap: 16px;">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+
+                <!-- Grade Distribution -->
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
+                            Grade Frequency Breakdown
+                        </div>
+                    </div>
+                    <div id="distribution-container" class="dist-container">
+                        <!-- Dynamic distribution chart -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Tab Switcher
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.view-section').forEach(view => view.classList.remove('active'));
+
+            event.currentTarget.classList.add('active');
+            document.getElementById(`view-${tabId}`).classList.add('active');
+
+            if (tabId === 'dashboard') loadStudents();
+            if (tabId === 'reports') loadReport();
+        }
+
+        // Subject Row Builder
+        function addSubjectRow(name = '', mark = '') {
+            const container = document.getElementById('subjects-container');
+            const row = document.createElement('div');
+            row.className = 'subject-row';
+            row.innerHTML = `
+                <input type="text" class="form-input subject-name-input" placeholder="Subject Name (e.g. Math)" value="${name}" required>
+                <input type="number" class="form-input subject-mark-input" placeholder="Mark" min="0" max="100" value="${mark}" required>
+                <button type="button" class="btn-icon" onclick="this.parentElement.remove()">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+            `;
+            container.appendChild(row);
+        }
+
+        // Initialize with default 3 subjects
+        function initForm() {
+            const container = document.getElementById('subjects-container');
+            container.innerHTML = '';
+            addSubjectRow('Mathematics', '88');
+            addSubjectRow('Physics', '92');
+            addSubjectRow('English', '78');
+        }
+
+        // Helper: Helper Grade Class
+        function getGradeCss(grade) {
+            const map = { 'A+': 'grade-Aplus', 'A': 'grade-A', 'B': 'grade-B', 'C': 'grade-C', 'D': 'grade-D', 'F': 'grade-F' };
+            return map[grade] || 'grade-F';
+        }
+
+        // 1. Fetch & Render All Students
+        async function loadStudents() {
+            const container = document.getElementById('students-grid');
+            try {
+                const res = await fetch('/api/students');
+                const students = await res.json();
+
+                if (!students.length) {
+                    container.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1/-1;">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                            <p>No student records registered yet.</p>
+                            <button class="btn btn-primary" style="width: auto; margin-top: 14px;" onclick="switchTab('add-student')">Add First Student</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = students.map(s => `
+                    <div class="student-item-card">
+                        <div class="student-card-top">
+                            <div>
+                                <div class="student-name">${escapeHtml(s.name)}</div>
+                                <div class="student-meta">${s.subjects.length} enrolled subjects</div>
+                            </div>
+                            <span class="grade-badge ${getGradeCss(s.grade)}">${s.grade}</span>
+                        </div>
+                        <div class="subject-tags">
+                            ${s.subjects.map(sub => `
+                                <div class="subject-tag">${escapeHtml(sub.name)}: <span>${sub.mark}</span></div>
+                            `).join('')}
+                        </div>
+                        <div class="student-card-stats">
+                            <div class="stat-box">
+                                <span class="stat-label">Total Marks</span>
+                                <span class="stat-val">${s.total}</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">Average</span>
+                                <span class="stat-val">${s.average.toFixed(2)}%</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">Performance</span>
+                                <span class="stat-val" style="color: #818cf8;">${s.label}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                container.innerHTML = `<div class="empty-state" style="color:#ef4444;">Failed to load students.</div>`;
+            }
+        }
+
+        // 2. Add Student Handler
+        async function handleAddStudent(e) {
+            e.preventDefault();
+            const toast = document.getElementById('form-toast');
+            toast.className = 'toast';
+            toast.style.display = 'none';
+
+            const name = document.getElementById('student-name-input').value.trim();
+            const subjectRows = document.querySelectorAll('.subject-row');
+            const subjects = [];
+
+            subjectRows.forEach(row => {
+                const sName = row.querySelector('.subject-name-input').value.trim();
+                const sMark = row.querySelector('.subject-mark-input').value.trim();
+                if (sName) {
+                    subjects.push({ name: sName, mark: sMark });
+                }
+            });
+
+            try {
+                const res = await fetch('/api/students', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, subjects })
+                });
+
+                const data = await res.json();
+                if (!data.ok) {
+                    toast.className = 'toast error';
+                    toast.textContent = data.error || 'Failed to save student.';
+                    return;
+                }
+
+                toast.className = 'toast success';
+                toast.textContent = data.message;
+                document.getElementById('student-name-input').value = '';
+                initForm();
+            } catch (err) {
+                toast.className = 'toast error';
+                toast.textContent = 'Server connection error.';
+            }
+        }
+
+        // 3. Search Handler
+        async function handleSearch() {
+            const query = document.getElementById('search-input').value.trim();
+            const resultArea = document.getElementById('search-result-area');
+
+            if (!query) {
+                resultArea.innerHTML = `
+                    <div class="empty-state">
+                        <p>Please enter a name to search.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/search?name=${encodeURIComponent(query)}`);
+                const data = await res.json();
+
+                if (!data.ok) {
+                    resultArea.innerHTML = `
+                        <div class="empty-state" style="color: #f87171;">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <p>${escapeHtml(data.error)}</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                resultArea.innerHTML = `
+                    <div class="student-item-card" style="border-color: var(--accent-primary);">
+                        <div class="student-card-top">
+                            <div>
+                                <div class="student-name" style="font-size: 18px;">${escapeHtml(data.name)}</div>
+                                <div class="student-meta">Search Result Match</div>
+                            </div>
+                            <span class="grade-badge ${getGradeCss(data.grade)}" style="font-size: 16px; padding: 6px 16px;">${data.grade}</span>
+                        </div>
+                        <div class="subject-tags" style="margin: 16px 0;">
+                            ${data.subjects.map(s => `
+                                <div class="subject-tag" style="font-size: 13px; padding: 5px 10px;">${escapeHtml(s.name)}: <span>${s.mark}</span></div>
+                            `).join('')}
+                        </div>
+                        <div class="student-card-stats" style="font-size: 14px; padding-top: 14px;">
+                            <div class="stat-box">
+                                <span class="stat-label">Total Score</span>
+                                <span class="stat-val">${data.total}</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">Average Mark</span>
+                                <span class="stat-val">${data.average.toFixed(2)}%</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">Status</span>
+                                <span class="stat-val" style="color: #34d399;">${data.label}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (err) {
+                resultArea.innerHTML = `<div class="empty-state" style="color:#ef4444;">Search request failed.</div>`;
+            }
+        }
+
+        // 4. Load Class Report
+        async function loadReport() {
+            try {
+                const res = await fetch('/api/report');
+                const data = await res.json();
+
+                if (!data.ok) {
+                    document.getElementById('rep-total-students').textContent = '0';
+                    document.getElementById('rep-class-avg').textContent = '0.00%';
+                    document.getElementById('rep-class-grade').textContent = 'N/A';
+                    document.getElementById('performers-container').innerHTML = `<div class="empty-state">No data available for reports.</div>`;
+                    document.getElementById('distribution-container').innerHTML = `<div class="empty-state">No distribution metrics.</div>`;
+                    return;
+                }
+
+                document.getElementById('rep-total-students').textContent = data.total_students;
+                document.getElementById('rep-class-avg').textContent = `${data.class_average.toFixed(2)}%`;
+                document.getElementById('rep-class-grade').textContent = `${data.class_grade} (${data.class_label})`;
+
+                // Top & Bottom Performers
+                const perfContainer = document.getElementById('performers-container');
+                perfContainer.innerHTML = `
+                    <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); padding: 14px; border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 11px; color: #34d399; font-weight: 700; text-transform: uppercase;">TOP PERFORMER</div>
+                            <div style="font-size: 16px; font-weight: 700; color: #fff;">${escapeHtml(data.top.name)}</div>
+                            <div style="font-size: 13px; color: var(--text-muted);">Average: ${data.top.average.toFixed(2)}%</div>
+                        </div>
+                        <span class="grade-badge ${getGradeCss(data.top.grade)}">${data.top.grade}</span>
+                    </div>
+
+                    ${!data.top.same_as_bottom ? `
+                        <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); padding: 14px; border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 11px; color: #f87171; font-weight: 700; text-transform: uppercase;">LOWEST PERFORMER</div>
+                                <div style="font-size: 16px; font-weight: 700; color: #fff;">${escapeHtml(data.bottom.name)}</div>
+                                <div style="font-size: 13px; color: var(--text-muted);">Average: ${data.bottom.average.toFixed(2)}%</div>
+                            </div>
+                            <span class="grade-badge ${getGradeCss(data.bottom.grade)}">${data.bottom.grade}</span>
+                        </div>
+                    ` : ''}
+                `;
+
+                // Distribution Chart
+                const distContainer = document.getElementById('distribution-container');
+                const gradesOrder = ['A+', 'A', 'B', 'C', 'D', 'F'];
+                const colorMap = {
+                    'A+': 'linear-gradient(90deg, #a855f7, #c084fc)',
+                    'A':  'linear-gradient(90deg, #3b82f6, #60a5fa)',
+                    'B':  'linear-gradient(90deg, #10b981, #34d399)',
+                    'C':  'linear-gradient(90deg, #eab308, #fde047)',
+                    'D':  'linear-gradient(90deg, #f97316, #fb923c)',
+                    'F':  'linear-gradient(90deg, #ef4444, #f87171)'
+                };
+
+                distContainer.innerHTML = gradesOrder.map(g => {
+                    const count = data.distribution[g] || 0;
+                    const pct = data.total_students ? (count / data.total_students) * 100 : 0;
+                    return `
+                        <div class="dist-row">
+                            <div class="dist-grade">${g}</div>
+                            <div class="dist-bar-bg">
+                                <div class="dist-bar-fill" style="width: ${pct}%; background: ${colorMap[g]};"></div>
+                            </div>
+                            <div class="dist-count">${count}</div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // Helper: Escape HTML
+        function escapeHtml(str) {
+            return str.replace(/[&<>"']/g, m => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+            })[m]);
+        }
+
+        // Initial Load
+        initForm();
+        loadStudents();
+    </script>
+</body>
+</html>
